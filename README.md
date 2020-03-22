@@ -49,7 +49,7 @@
 
 ## Release APK
 
-<a href="http://bit.ly/NewsApp-v2" target="_blank">
+<a href="https://drive.google.com/open?id=1rRtfnjS-skv4Y6Lw82uLx6yWpNCORGLU" target="_blank">
   <img src="https://img.shields.io/badge/Download%20on%20the-Google%20Drive-blue.svg?style=popout&logo=google-drive"/>
 </a>
 
