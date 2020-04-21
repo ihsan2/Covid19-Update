@@ -20,7 +20,12 @@ import NumberFormat from 'react-number-format';
 import moment from 'moment';
 import PieChart from 'react-native-pie-chart';
 import {connect} from 'react-redux';
-import {getCountries, getConfirm, getAll} from '../src/redux/action';
+import {
+  getCountries,
+  getConfirm,
+  getAll,
+  getIndonesiaData,
+} from '../src/redux/action';
 import Loading from 'react-native-spinkit';
 
 const color1 = '#161A1E';
@@ -42,6 +47,7 @@ class Home extends Component {
       all1: 1,
       all2: 1,
       all3: 1,
+      ina: {},
     };
   }
 
@@ -68,7 +74,15 @@ class Home extends Component {
   };
 
   _getConfirm = () => {
-    this.props.getC2(this.state.country);
+    if (this.state.country === 'Indonesia') {
+      this.props.getIna().then(() => {
+        this.props.data.ina.map(res => {
+          this.setState({ina: res});
+        });
+      });
+    } else {
+      this.props.getC2(this.state.country);
+    }
   };
 
   _getAll = () => {
@@ -99,35 +113,28 @@ class Home extends Component {
     }
   };
 
-  // SearchFilterFunction = text => {
-  //   const newData = this.state.countries.filter(item => {
-  //     //applying filter for the inserted text in search bar
-  //     const itemData = item.country ? item.country : '';
-  //     const textData = text;
-  //     return itemData.indexOf(textData) > -1;
-  //   });
-  //   console.log(newData);
-  //   this.setState({
-  //     countries: newData,
-  //     search: text,
-  //   });
-  // };
-
   render() {
     const {data} = this.props;
-    const {all1, all2, all3} = this.state;
-    const persentR = Number(
-      (data.confirm.recovered / data.confirm.cases) * 100,
-    ).toFixed(2);
-    const persentD = Number(
-      (data.confirm.deaths / data.confirm.cases) * 100,
-    ).toFixed(2);
+    const {all1, all2, all3, ina} = this.state;
+    let perR, perD;
+    if (this.state.country === 'Indonesia') {
+      perR = Number((ina.sembuh / ina.positif) * 100).toFixed(2);
+      perD = Number((ina.meninggal / ina.positif) * 100).toFixed(2);
+    } else {
+      perR = Number(
+        (data.confirm.recovered / data.confirm.cases) * 100,
+      ).toFixed(2);
+      perD = Number((data.confirm.deaths / data.confirm.cases) * 100).toFixed(
+        2,
+      );
+    }
     const persentR1 = Number(
       (data.all.recovered / data.all.cases) * 100,
     ).toFixed(2);
     const persentD1 = Number((data.all.deaths / data.all.cases) * 100).toFixed(
       2,
     );
+
     const chart_wh = 200;
     const series = [all1, all2, all3];
     const sliceColor = [colorM, colorS, colorTotal];
@@ -186,6 +193,7 @@ class Home extends Component {
             visible={this.state.modalVisible}
             onRequestClose={() => {
               this.setModalVisible(!this.state.modalVisible);
+              this.setState({search: ''});
             }}>
             <SafeAreaView
               style={{
@@ -292,7 +300,9 @@ class Home extends Component {
                   fontSize: wp('4.2'),
                   fontWeight: 'bold',
                 }}>
-                {data.confirm.country}
+                {this.state.country === 'Indonesia'
+                  ? ina.name
+                  : data.confirm.country}
               </Text>
               <Text style={{color: color2}}>
                 Last update at{' '}
@@ -301,7 +311,11 @@ class Home extends Component {
               <View style={{flexDirection: 'row', marginVertical: hp('3.2')}}>
                 <View style={{alignItems: 'center'}}>
                   <NumberFormat
-                    value={data.confirm.recovered}
+                    value={
+                      this.state.country === 'Indonesia'
+                        ? ina.sembuh
+                        : data.confirm.recovered
+                    }
                     displayType={'text'}
                     thousandSeparator="."
                     decimalSeparator=","
@@ -323,7 +337,8 @@ class Home extends Component {
                       fontSize: wp('3.6'),
                       fontWeight: 'bold',
                     }}>
-                    ({persentR}%)
+                    ({perR}
+                    %)
                   </Text>
                   <Text
                     style={{
@@ -337,7 +352,11 @@ class Home extends Component {
                 <View
                   style={{alignItems: 'center', marginHorizontal: wp('16')}}>
                   <NumberFormat
-                    value={data.confirm.cases}
+                    value={
+                      this.state.country === 'Indonesia'
+                        ? ina.positif
+                        : data.confirm.cases
+                    }
                     displayType={'text'}
                     thousandSeparator={'.'}
                     prefix={''}
@@ -364,7 +383,11 @@ class Home extends Component {
                 </View>
                 <View style={{alignItems: 'center'}}>
                   <NumberFormat
-                    value={data.confirm.deaths}
+                    value={
+                      this.state.country === 'Indonesia'
+                        ? ina.meninggal
+                        : data.confirm.deaths
+                    }
                     displayType={'text'}
                     thousandSeparator={'.'}
                     prefix={''}
@@ -386,7 +409,8 @@ class Home extends Component {
                       fontSize: wp('3.6'),
                       fontWeight: 'bold',
                     }}>
-                    ({persentD}%)
+                    ({perD}
+                    %)
                   </Text>
                   <Text
                     style={{
@@ -622,6 +646,7 @@ const mapDispatchToProps = dispatch => ({
   getC1: () => dispatch(getCountries()),
   getC2: country => dispatch(getConfirm(country)),
   getA: () => dispatch(getAll()),
+  getIna: () => dispatch(getIndonesiaData()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

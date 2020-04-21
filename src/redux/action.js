@@ -10,7 +10,17 @@ export const getConfirm = country => ({
   payload: axios.get(`https://corona.lmao.ninja/countries/${country}`),
 });
 
+export const getIndonesiaData = () => ({
+  type: 'INA',
+  payload: axios.get('https://api.kawalcorona.com/indonesia/'),
+});
+
 export const getAll = () => ({
   type: 'ALL',
   payload: axios.get('https://corona.lmao.ninja/all'),
+});
+
+export const getProv = () => ({
+  type: 'PROV',
+  payload: axios.get('https://api.kawalcorona.com/indonesia/provinsi/'),
 });

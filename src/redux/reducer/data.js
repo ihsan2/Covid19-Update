@@ -5,6 +5,8 @@ const initialState = {
   isRejected: false,
   confirm: {},
   all: {},
+  ina: [],
+  prov: [],
 };
 
 const data = (state = initialState, action) => {
@@ -53,6 +55,52 @@ const data = (state = initialState, action) => {
         isFulfilled: true,
         isRejected: false,
         confirm: action.payload.data,
+      };
+
+    // get list of indonesai
+    case 'INA_PENDING':
+      return {
+        ...state,
+        isLoading: true,
+        isRejected: false,
+        isFulfilled: false,
+      };
+    case 'INA_REJECTED':
+      return {
+        ...state,
+        isLoading: false,
+        isRejected: true,
+      };
+    case 'INA_FULFILLED':
+      return {
+        ...state,
+        isLoading: false,
+        isFulfilled: true,
+        isRejected: false,
+        ina: action.payload.data,
+      };
+
+    // get list of provinsi
+    case 'PROV_PENDING':
+      return {
+        ...state,
+        isLoading: true,
+        isRejected: false,
+        isFulfilled: false,
+      };
+    case 'PROV_REJECTED':
+      return {
+        ...state,
+        isLoading: false,
+        isRejected: true,
+      };
+    case 'PROV_FULFILLED':
+      return {
+        ...state,
+        isLoading: false,
+        isFulfilled: true,
+        isRejected: false,
+        prov: action.payload.data,
       };
 
     // get list of ALL
